@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PacketPirate 🏴‍☠️</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="maincontainer" class="container mt-5">
+        <h1 id="packetpirate" class="text-center mb-4">PacketPirate 🏴‍☠️</h1>
+
+        <div class="row justify-content-center mb-3">
+            <div class="col-md-8">
+                <div class="interface-controls">
+                    <div class="interface-selector">
+                        <label for="interfaceDropdown">Interface Name:</label>
+                        <select id="interfaceDropdown" class="form-control"></select>
+                    </div>
+                    <div class="button-group">
+                        <button id="startButton" class="btn btn-success">Start Sniffing</button>
+                        <button id="stopButton" class="btn btn-secondary" disabled>Stop Sniffing</button>
+                        <button id="clearButton" class="btn btn-danger" disabled>Clear Output</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div id="packetList" class="packet-list bg-light p-3 rounded"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
