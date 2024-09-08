@@ -34,11 +34,17 @@ PacketPirate caters to individuals seeking a straightforward, customizable netwo
 
 ### Executing program
 
-* Run `./start.ps1` will start both the backend and frontend
+* Running `./start.ps1` will start both the backend and frontend
+* open the frontend on `http://localhost:8000/` or the address shown in the console
 
 ## Help
 
 Feel free to open any issues.
+
+### ToDos
+* more complex filtering options: include min/max payload size, text in payload,...
+* incoming/outgoing data rate including graphs
+* better GUI 
 
 ## Authors
 
