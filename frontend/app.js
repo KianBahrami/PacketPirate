@@ -1,3 +1,5 @@
+import { PacketToHTML } from './packetToHTML.js';
+
 let socket;
 let selectedInterface = ''
 const startButton = document.getElementById('startButton');
@@ -58,30 +60,7 @@ function connectWebSocket() {
 function addPacketToList(packet) {
     const packetElement = document.createElement('div');
     packetElement.className = 'packet-item';
-    packetElement.innerHTML = `
-        <div class="packet-summary">
-            ${packet.networklayer.src} → ${packet.networklayer.dest} (${packet.time})
-        </div>
-        <div class="packet-details" style="display: none;">
-            <p><strong>Link Layer Protocol:</strong> ${packet.linklayer.protocol}</p>
-            <p>Source → Destination MAC: ${packet.linklayer.src} → ${packet.linklayer.dest}</p>
-            <p><strong>Network Layer Protocol:</strong> ${packet.networklayer.protocol}</p>
-            <p>Source → Destination IP-Address: ${packet.networklayer.src} → ${packet.networklayer.dest}</p>
-            <p>TTL/ HOP Limit: ${packet.networklayer.ttl}</p>
-            <p><strong>Transport Layer Protocol:</strong> ${packet.transportlayer.protocol}</p>
-            <p>Source → Destination Port: ${packet.transportlayer.src} → ${packet.transportlayer.dest}</p>
-            <p>Flags: ${packet.transportlayer.tcpflags}</p>
-            <p>Seq: ${packet.transportlayer.tcpseq}</p>
-            <p>Ack: ${packet.transportlayer.tcpack}</p>
-            <p>Window: ${packet.transportlayer.tcpwindow}</p>
-            <p><strong>Application Layer Protocol:</strong> ${packet.applicationlayer.protocol}</p>
-            <p>Payload Size: ${packet.applicationlayer.payloadsize}</p>
-            <p>http Method: ${packet.applicationlayer.httpmethod}</p>
-            <p>http Url: ${packet.applicationlayer.httpurl}</p>
-            <p>http Version: ${packet.applicationlayer.httpversion}</p>
-            <p><strong>Raw Package:</strong> ${packet.raw}</p>
-        </div>
-    `;
+    packetElement.innerHTML = PacketToHTML(packet);
     
     // Add click event to toggle details
     packetElement.querySelector('.packet-summary').addEventListener('click', function() {
