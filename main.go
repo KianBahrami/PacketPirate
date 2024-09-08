@@ -45,7 +45,7 @@ func main() {
 		handler := c.Handler(http.DefaultServeMux)
 
 		// serve server
-		log.Println("Backend server starting on :8080")
+		log.Println("Backend server starting on http://localhost:8080")
 		log.Fatal(http.ListenAndServe(":8080", handler))
 	}()
 
@@ -59,7 +59,7 @@ func main() {
 		frontendMux := http.NewServeMux()
 		frontendMux.Handle("/", fs)
 
-		log.Println("Frontend server starting on :8000")
+		log.Println("Frontend server starting on http://localhost:8000")
 		if err := http.ListenAndServe(":8000", frontendMux); err != nil {
 			log.Fatal("Frontend server error:", err)
 		}
