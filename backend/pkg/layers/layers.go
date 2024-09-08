@@ -130,15 +130,6 @@ func ExtractPacketInfo(packet gopacket.Packet) PacketInfo {
 		info.ApplicationLayer.HTTPMethod = "-"
 		info.ApplicationLayer.HTTPURL = "-"
 		info.ApplicationLayer.HTTPVersion = "-"
-		// TODO
-		//    // Example: Parse HTTP if present
-		//    if httpLayer := packet.Layer(layers.LayerTypeHTTP); httpLayer != nil {
-		//        if http, ok := httpLayer.(*layers.HTTP); ok {
-		//            info.ApplicationLayer.HTTPMethod = string(http.Method)
-		//            info.ApplicationLayer.HTTPURL = string(http.URL)
-		//            info.ApplicationLayer.HTTPVersion = string(http.Version)
-		//        }
-		//    }
 	}
 
 	info.Raw = packet.String()

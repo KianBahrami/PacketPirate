@@ -19,6 +19,15 @@ type AvailableInterfaces struct {
 
 // message when starting the webservice
 type StartWebSocketMsg struct {
-	Command   string `json:"command"`
-	Interface string `json:"interface"`
+	Command       string        `json:"command"`
+	Interface     string        `json:"interface"`
+	Filteroptions FilterOptions `json:"filteroptions"`
+}
+
+type FilterOptions struct {
+	NetworkLayerProtocol   string `json:"networklayerprotocol"`
+	TransportLayerProtocol string `json:"transportlayerprotocol"`
+	SrcIp                  string `json:"srcip"`
+	DestIp                 string `json:"destip"`
+	MinPaylaodSize         string `json:"minpayloadsize"`
 }

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
     <div id="maincontainer" class="container mt-5">
         <h1 id="packetpirate" class="text-center mb-4">PacketPirate 🏴‍☠️</h1>
@@ -16,15 +18,57 @@
             <div class="col-md-8">
                 <div class="interface-controls">
                     <div class="interface-selector">
-                        <label for="interfaceDropdown">Interface Name:</label>
+                        <label for="interfaceDropdown">Interface</label>
                         <select id="interfaceDropdown" class="form-control"></select>
                     </div>
                     <div class="button-group">
                         <button id="startButton" class="btn btn-success">Start Sniffing</button>
                         <button id="stopButton" class="btn btn-secondary" disabled>Stop Sniffing</button>
-                        <button id="clearButton" class="btn btn-danger" disabled>Clear Output</button>
+                        <button id="clearButton" class="btn btn-danger">Clear Output</button>
+                        <button id="filterButton" class="btn btn-secondary">🔍
+                            <i class="fas fa-filter"></i>
+                        </button>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <div id="filterPanel" class="filter-panel">
+            <h3>Filter Options</h3>
+            <div class="filter-option">
+                <label for="networkLayerProtocolDropdown">Network Layer Protocol</label>
+                <select id="networkLayerProtocolDropdown" class="form-control">
+                    <option value="any">any</option>
+                    <!-- values are the strings needed for BPF filter in backend -->
+                    <option value="ip">IPv4</option>
+                    <option value="ip6">IPv6</option>
+                </select>
+            </div>
+            <div class="filter-option">
+                <label for="transportLayerProtocolDropdown">Transport Layer Protocol</label>
+                <select id="transportLayerProtocolDropdown" class="form-control">
+                    <option value="any">any</option>
+                    <option value="tcp">tcp</option>
+                    <option value="udp">udp</option>
+                </select>
+            </div>
+            <div class="filter-option">
+                <label for="filter-srcip">Source IP-Address:</label>
+                <input type="text" id="filter-srcip" name="filter-srcip" placeholder="Enter source IP-Address">
+            </div>
+            <div class="filter-option">
+                <label for="filter-destip">Destination IP-Address:</label>
+                <input type="text" id="filter-destip" name="filter-destip" placeholder="Enter destination IP-Address">
+            </div>
+
+            <div class="filter-option">
+                <label for="filter-minpayloadsize">Minimum Payload Size</label>
+                <input type="text" id="filter-minpayloadsize" name="filter-minpayloadsize"
+                    placeholder="Enter minimum payload size">
+            </div>
+
+            <div class="button-container">
+                <button id="applyFilterButton" class="btn btn-secondary">Apply filters</button>
             </div>
         </div>
 
@@ -37,4 +81,5 @@
 
     <script type="module" src="app.js"></script>
 </body>
+
 </html>

@@ -1,20 +1,22 @@
 body {
+    justify-content: center;
     background-color: lightblue;
 }
 
 #maincontainer {
+    max-width: 85%;
     flex-grow: 1;
     display: flex;
     flex-direction: column;
 }
 
 .packet-list {
-    min-height: 400px; 
-    max-height: 600px; 
-    height: 70vh; 
+    min-height: 400px;
+    max-height: 600px;
+    height: 70vh;
     overflow-y: auto;
     background-color: white;
-    border: 1px solid #ddd; 
+    border: 1px solid #ddd;
     border-radius: 4px;
     padding: 10px;
 }
@@ -61,31 +63,29 @@ body {
 }
 
 .interface-controls {
-    display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 15px;
 }
 
 .interface-selector {
+    align-items: baseline;
+    display: flex;
     flex-grow: 1;
-    margin-right: 15px;
+    margin-bottom: 10px;
 }
 
 .interface-selector label {
     font-family: 'Arial', sans-serif;
-    font-size: 18px;
+    font-size: 20px;
     font-weight: bold;
     color: #333;
     margin-right: 10px;
 }
 
 .button-group {
-    display: flex;
-}
-
-#startButton, #stopButton, #clearButton {
-    margin-left: 10px;
+    display: inline-flex;
+    gap: 15px;
 }
 
 .packet-entry {
@@ -93,17 +93,20 @@ body {
     margin-bottom: 10px;
 }
 
-.packet-summary, .layer-summary {
+.packet-summary,
+.layer-summary {
     cursor: pointer;
     padding: 10px;
     background-color: #f0f0f0;
 }
 
-.packet-summary:hover, .layer-summary:hover {
+.packet-summary:hover,
+.layer-summary:hover {
     background-color: #e0e0e0;
 }
 
-.packet-details, .layer-details {
+.packet-details,
+.layer-details {
     padding: 10px;
 }
 
@@ -124,7 +127,7 @@ pre {
     display: inline-block;
     width: 0;
     height: 0;
-    border-left: 6px solid black; /* Arrow color */
+    border-left: 6px solid black;
     border-top: 6px solid transparent;
     border-bottom: 6px solid transparent;
     transition: transform 0.3s ease;
@@ -132,4 +135,43 @@ pre {
 
 .layer-summary.open .dropdown-arrow::before {
     transform: rotate(90deg);
+}
+
+.filter-panel {
+    position: fixed;
+    left: -600px;
+    top: 0;
+    width: 600px;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-right: 1px solid #ddd;
+    padding: 20px;
+    transition: left 0.3s ease-in-out;
+    z-index: 1000;
+}
+
+.filter-panel.open {
+    left: 0;
+}
+
+#filterButton {
+    padding: 10px 20px;
+    height: 40px;
+}
+
+.filter-option label {
+    flex: 0 0 30px;
+    margin-right: 10px;
+}
+
+.filter-option input {
+    flex: 1;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 15px;
 }

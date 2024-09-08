@@ -2,10 +2,11 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
+	"github.com/KianBahrami/PacketPirate/pkg/layers"
 	"log"
 	"net/http"
 	"sync"
-    "github.com/KianBahrami/PacketPirate/pkg/layers"
 
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/pcap"
@@ -71,7 +72,7 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 		if msg.Command == "start" { // received start message via websocket
 			log.Println("Starting packet capture on interface:", msg.Interface)
 			wg.Add(1)
-			go capturePackets(conn, &wg, stopChan, msg.Interface) // goroutine synchronized by wg
+			go capturePackets(conn, &wg, stopChan, msg.Interface, msg.Filteroptions) // goroutine synchronized by wg
 		} else if messageType == websocket.TextMessage && string(p) == "stop" { // receive stop message via websocket
 			log.Println("Stopping packet capture")
 			close(stopChan)
@@ -82,7 +83,7 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 }
 
 // sends json with packet info to the frontend via the websocket
-func capturePackets(conn *websocket.Conn, wg *sync.WaitGroup, stopChan chan struct{}, interfaceName string) {
+func capturePackets(conn *websocket.Conn, wg *sync.WaitGroup, stopChan chan struct{}, interfaceName string, filterOptions FilterOptions) {
 	// new packet capture can be started if no other runs
 	defer wg.Done()
 
@@ -96,7 +97,25 @@ func capturePackets(conn *websocket.Conn, wg *sync.WaitGroup, stopChan chan stru
 	}
 	defer handle.Close()
 
-	err = handle.SetBPFFilter("tcp")
+	// Construct BPF filter string
+	bpfFilter := ""
+	if filterOptions.NetworkLayerProtocol != "any" && filterOptions.TransportLayerProtocol != "any" {
+		bpfFilter += fmt.Sprintf("%s and %s", filterOptions.NetworkLayerProtocol, filterOptions.TransportLayerProtocol)
+	} else if filterOptions.TransportLayerProtocol != "any" {
+		bpfFilter += fmt.Sprintf(filterOptions.TransportLayerProtocol)
+	} else if filterOptions.NetworkLayerProtocol != "any" {
+		bpfFilter += fmt.Sprintf(filterOptions.NetworkLayerProtocol)
+	}
+	if filterOptions.SrcIp != "" {
+		bpfFilter += fmt.Sprintf(" and src host %s", filterOptions.SrcIp)
+	}
+	if filterOptions.DestIp != "" {
+		bpfFilter += fmt.Sprintf(" and dst host %s", filterOptions.DestIp)
+	}
+	log.Printf("Applying BPF filter: %s", bpfFilter)
+
+	// set filter
+	err = handle.SetBPFFilter(bpfFilter)
 	if err != nil {
 		log.Println("Error setting BPF filter:", err)
 		return
@@ -111,7 +130,7 @@ func capturePackets(conn *websocket.Conn, wg *sync.WaitGroup, stopChan chan stru
 			return
 		case packet := <-packetSource.Packets():
 			log.Println("Packet captured")
-            packetData := layers.ExtractPacketInfo(packet)
+			packetData := layers.ExtractPacketInfo(packet)
 
 			jsonData, err := json.Marshal(packetData)
 			if err != nil {
