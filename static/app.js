@@ -87,6 +87,11 @@ function addPacketToList(packet) {
 // connect to websocket if start button is clicked
 startButton.addEventListener("click", function () {
   console.log("Start button clicked");
+  if (interfaceDropdown.value == "") {
+    alert("Please select an interface!");
+    console.log("No interface selected, aborting")
+    return
+  }
   connectWebSocket();
   this.disabled = true;
   stopButton.disabled = false;

@@ -19,7 +19,9 @@
                 <div class="interface-controls">
                     <div class="interface-selector">
                         <label for="interfaceDropdown">Interface</label>
-                        <select id="interfaceDropdown" class="form-control"></select>
+                        <select id="interfaceDropdown" class="form-control">
+                            <option value="" selected></option>
+                        </select>
                     </div>
                     <div class="button-group">
                         <button id="startButton" class="btn btn-success">Start Sniffing</button>
@@ -38,7 +40,7 @@
             <div class="filter-option">
                 <label for="networkLayerProtocolDropdown">Network Layer Protocol</label>
                 <select id="networkLayerProtocolDropdown" class="form-control">
-                    <option value="any">any</option>
+                    <option value="any" selected>any</option>
                     <!-- values are the strings needed for BPF filter in backend -->
                     <option value="ip">IPv4</option>
                     <option value="ip6">IPv6</option>
@@ -47,7 +49,7 @@
             <div class="filter-option">
                 <label for="transportLayerProtocolDropdown">Transport Layer Protocol</label>
                 <select id="transportLayerProtocolDropdown" class="form-control">
-                    <option value="any">any</option>
+                    <option value="any" selected>any</option>
                     <option value="tcp">tcp</option>
                     <option value="udp">udp</option>
                 </select>
