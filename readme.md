@@ -24,7 +24,8 @@ PacketPirate caters to individuals seeking a straightforward, customizable netwo
 
 ### Dependencies
 
-* go version go1.23.0 windows/amd64 
+* go version go1.23.0 windows/amd64
+    * needed go modules in `./backend/go.mod`
 * node version v16.13.2
 
 ### Installing
