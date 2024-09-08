@@ -37,7 +37,7 @@ PacketPirate caters to individuals seeking a straightforward, customizable netwo
 * Running `./start.ps1` will start both the backend and frontend
 * open the frontend on `http://localhost:8000/` or the address shown in the console
 
-## Help
+### Help
 
 Feel free to open any issues.
 
