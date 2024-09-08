@@ -25,7 +25,7 @@ PacketPirate caters to individuals seeking a straightforward, customizable netwo
 ### Dependencies
 
 * go version go1.23.0 windows/amd64
-    * needed go modules in `./backend/go.mod`
+    * needed go modules in `./go.mod`
 * node version v16.13.2
 
 ### Installing
@@ -34,8 +34,8 @@ PacketPirate caters to individuals seeking a straightforward, customizable netwo
 
 ### Executing program
 
-* Running `./start.ps1` will start both the backend and frontend
-* open the frontend on `http://localhost:8000/` or the address shown in the console
+* Running `go run .` in the root folder will start both the backend and frontend
+* open the frontend on `http://localhost:8000/` 
 
 ### Help
 
