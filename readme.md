@@ -41,7 +41,7 @@ PacketPirate caters to individuals seeking a straightforward, customizable netwo
 
 Feel free to open any issues.
 
-### ToDos
+## ToDos
 * more complex filtering options: include min/max payload size, text in payload,...
 * incoming/outgoing data rate including graphs
 * better GUI 
