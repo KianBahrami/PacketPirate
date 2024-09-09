@@ -52,6 +52,14 @@ func CapturePackets(conn *websocket.Conn, wg *sync.WaitGroup, stopChan chan stru
 			bpfFilter += fmt.Sprintf("host %s", filterOptions.DestIp)
 		}
 	}
+	if filterOptions.MinPaylaodSize != "" {
+		if len(bpfFilter) != 0 {
+			bpfFilter += fmt.Sprintf(" and len > %v", filterOptions.MinPaylaodSize)
+		} else {
+			bpfFilter += fmt.Sprintf("len > %v", filterOptions.MinPaylaodSize)
+		}
+		
+	}
 	log.Printf("Applying BPF filter: %s", bpfFilter)
 
 	// set filter
