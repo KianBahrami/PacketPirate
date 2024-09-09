@@ -2,15 +2,13 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
-	"github.com/KianBahrami/PacketPirate/pkg/layers"
+	"github.com/KianBahrami/PacketPirate/pkg/interfaces"
+	"github.com/KianBahrami/PacketPirate/pkg/packets"
 	"github.com/KianBahrami/PacketPirate/pkg/types"
 	"log"
 	"net/http"
 	"sync"
 
-	"github.com/google/gopacket"
-	"github.com/google/gopacket/pcap"
 	"github.com/gorilla/websocket"
 	"github.com/rs/cors"
 )
@@ -35,7 +33,7 @@ func main() {
 
 		// setup routs and their functions
 		http.HandleFunc("/ws", handleWebSocket)
-		http.HandleFunc("/get-interfaces", sendInterfaces)
+		http.HandleFunc("/get-interfaces", interfaces.SendInterfaces)
 
 		// create CORS handler
 		c := cors.New(cors.Options{
@@ -106,114 +104,7 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 		if msg.Command == "start" { // received start message via websocket
 			log.Println("Starting packet capture on interface:", msg.Interface)
 			wg.Add(1)
-			go capturePackets(conn, &wg, stopChan, msg.Interface, msg.Filteroptions) // goroutine synchronized by wg
+			go packets.CapturePackets(conn, &wg, stopChan, msg.Interface, msg.Filteroptions) // goroutine synchronized by wg
 		}
 	}
-}
-
-// sends json with packet info to the frontend via the websocket
-func capturePackets(conn *websocket.Conn, wg *sync.WaitGroup, stopChan chan struct{}, interfaceName string, filterOptions types.FilterOptions) {
-	// new packet capture can be started if no other runs
-	defer wg.Done()
-
-	// You may need to change this to match an interface on your system
-	log.Printf("Attempting to open interface: %s", interfaceName)
-
-	handle, err := pcap.OpenLive(interfaceName, 1600, true, pcap.BlockForever)
-	if err != nil {
-		log.Println("Error opening interface:", err)
-		return
-	}
-	defer handle.Close()
-
-	// Construct BPF filter string
-	bpfFilter := ""
-	if filterOptions.NetworkLayerProtocol != "any" && filterOptions.TransportLayerProtocol != "any" && filterOptions.NetworkLayerProtocol != "" && filterOptions.TransportLayerProtocol != "" {
-		bpfFilter += fmt.Sprintf("%s and %s", filterOptions.NetworkLayerProtocol, filterOptions.TransportLayerProtocol)
-	} else if filterOptions.TransportLayerProtocol != "any" {
-		bpfFilter += fmt.Sprintf(filterOptions.TransportLayerProtocol)
-	} else if filterOptions.NetworkLayerProtocol != "any" {
-		bpfFilter += fmt.Sprintf(filterOptions.NetworkLayerProtocol)
-	}
-	if filterOptions.SrcIp != "" {
-		// filter is not empty so we need an "and"
-		if len(bpfFilter) != 0 {
-			bpfFilter += fmt.Sprintf(" and src host %s", filterOptions.SrcIp)
-		} else {
-			bpfFilter += fmt.Sprintf("src host %s", filterOptions.SrcIp)
-		}
-	}
-	if filterOptions.DestIp != "" {
-		// filter is not empty so we need an "and"
-		if len(bpfFilter) != 0 {
-			bpfFilter += fmt.Sprintf(" and dst host %s", filterOptions.DestIp)
-		} else {
-			bpfFilter += fmt.Sprintf("host %s", filterOptions.DestIp)
-		}
-	}
-	log.Printf("Applying BPF filter: %s", bpfFilter)
-
-	// set filter
-	err = handle.SetBPFFilter(bpfFilter)
-	if err != nil {
-		log.Println("Error setting BPF filter:", err)
-		return
-	}
-
-	log.Println("Starting packet capture...")
-	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
-	for {
-		select {
-		case <-stopChan:
-			log.Println("Stopping packet capture...")
-			return
-		case packet := <-packetSource.Packets():
-			log.Println("Packet captured")
-			packetData := layers.ExtractPacketInfo(packet)
-
-			jsonData, err := json.Marshal(packetData)
-			if err != nil {
-				log.Println("Error marshalling packet data:", err)
-				continue
-			}
-
-			if err := conn.WriteMessage(websocket.TextMessage, jsonData); err != nil {
-				log.Println("Error sending packet data:", err)
-				return
-			}
-		}
-	}
-}
-
-// sends json with all available interfaces to frontend via http
-func sendInterfaces(w http.ResponseWriter, r *http.Request) {
-	// first get available interfaces
-	devices, err := pcap.FindAllDevs()
-	if err != nil {
-		log.Println("Error finding network interfaces:", err)
-		return
-	}
-
-	log.Println("Available network interfaces:")
-	for _, device := range devices {
-		log.Printf("Name: %s, Description: %s", device.Name, device.Description)
-	}
-
-	// create struct that carries the interfaces
-	availableifaces := types.AvailableInterfaces{}
-	for _, device := range devices {
-		iface := types.InterfaceData{
-			Name:        device.Name,
-			Addr:        device.Addresses,
-			Description: device.Description,
-			Flags:       device.Flags,
-		}
-		availableifaces.Interfaces = append(availableifaces.Interfaces, iface)
-	}
-
-	// set response content type to json
-	w.Header().Set("Content-Type", "application/json")
-
-	// send
-	json.NewEncoder(w).Encode(availableifaces)
 }
