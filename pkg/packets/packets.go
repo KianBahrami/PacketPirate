@@ -17,7 +17,6 @@ func CapturePackets(conn *websocket.Conn, wg *sync.WaitGroup, stopChan chan stru
 	// new packet capture can be started if no other runs
 	defer wg.Done()
 
-	// You may need to change this to match an interface on your system
 	log.Printf("Attempting to open interface: %s", interfaceName)
 
 	handle, err := pcap.OpenLive(interfaceName, 1600, true, pcap.BlockForever)

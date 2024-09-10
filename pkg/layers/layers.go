@@ -2,10 +2,10 @@ package layers
 
 import (
 	"fmt"
-	"time"
-
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
+	"net"
+	"time"
 )
 
 type PacketInfo struct {
@@ -17,11 +17,19 @@ type PacketInfo struct {
 		DstMAC   string `json:"dest"`
 	} `json:"linklayer"`
 	NetworkLayer struct {
-		Protocol string `json:"protocol"`
-		SrcIP    string `json:"src"`
-		DstIP    string `json:"dest"`
-		TTL      uint8  `json:"ttl"`
+		Protocol     string `json:"protocol"`
+		SrcIP        string `json:"src"`
+		DstIP        string `json:"dest"`
+		TTL          uint8  `json:"ttl"`
+		ARPOperation uint16 `json:"arpoperation,omitempty"`
 	} `json:"networklayer"`
+	ARPLayer struct {
+		Operation uint16 `json:"operation,omitempty"`
+		SrcMAC    string `json:"srcmac,omitempty"`
+		DstMAC    string `json:"dstmac,omitempty"`
+		SrcIP     string `json:"srcip,omitempty"`
+		DstIP     string `json:"dstip,omitempty"`
+	} `json:"arplayer,omitempty"`
 	TransportLayer struct {
 		Protocol  string `json:"protocol"`
 		SrcPort   uint16 `json:"src"`
@@ -88,17 +96,34 @@ func ExtractPacketInfo(packet gopacket.Packet) PacketInfo {
 		}
 	}
 
+	// maybe arp layer
+	if arpLayer := packet.Layer(layers.LayerTypeARP); arpLayer != nil {
+		arp, _ := arpLayer.(*layers.ARP)
+		info.ARPLayer.Operation = arp.Operation
+		info.ARPLayer.SrcMAC = net.HardwareAddr(arp.SourceHwAddress).String()
+		info.ARPLayer.DstMAC = net.HardwareAddr(arp.DstHwAddress).String()
+		info.ARPLayer.SrcIP = net.IP(arp.SourceProtAddress).String()
+		info.ARPLayer.DstIP = net.IP(arp.DstProtAddress).String()
+	} else {
+		info.ARPLayer.Operation = 42
+		info.ARPLayer.SrcMAC = "None"
+		info.ARPLayer.DstMAC = "None"
+		info.ARPLayer.SrcIP = "None"
+		info.ARPLayer.DstIP = "None"
+	}
+
 	// Network Layer
 	if networkLayer := packet.NetworkLayer(); networkLayer != nil {
 		info.NetworkLayer.Protocol = networkLayer.LayerType().String()
-		if ip4, ok := networkLayer.(*layers.IPv4); ok {
-			info.NetworkLayer.SrcIP = ip4.SrcIP.String()
-			info.NetworkLayer.DstIP = ip4.DstIP.String()
-			info.NetworkLayer.TTL = ip4.TTL
-		} else if ip6, ok := networkLayer.(*layers.IPv6); ok {
-			info.NetworkLayer.SrcIP = ip6.SrcIP.String()
-			info.NetworkLayer.DstIP = ip6.DstIP.String()
-			info.NetworkLayer.TTL = ip6.HopLimit
+		switch nl := networkLayer.(type) {
+		case *layers.IPv4:
+			info.NetworkLayer.SrcIP = nl.SrcIP.String()
+			info.NetworkLayer.DstIP = nl.DstIP.String()
+			info.NetworkLayer.TTL = nl.TTL
+		case *layers.IPv6:
+			info.NetworkLayer.SrcIP = nl.SrcIP.String()
+			info.NetworkLayer.DstIP = nl.DstIP.String()
+			info.NetworkLayer.TTL = nl.HopLimit
 		}
 	}
 

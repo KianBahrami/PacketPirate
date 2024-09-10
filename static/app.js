@@ -15,7 +15,7 @@ const filterMinPayloadSize = document.getElementById("filter-minpayloadsize");
 
 // add eventlistener for loading the webpage
 document.addEventListener("DOMContentLoaded", function () {
-  fetch("http://192.168.0.14:8080/get-interfaces") // fetch interface api
+  fetch("http://localhost:8080/get-interfaces") // fetch interface api
     .then((response) => response.json()) // bring response into json
     .then((data) => {
       data.interfaces.forEach((iface) => {
