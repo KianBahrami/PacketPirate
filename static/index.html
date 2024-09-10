@@ -11,11 +11,11 @@
 </head>
 
 <body>
-    <div id="maincontainer" class="container mt-5">
+    <div id="maincontainer" class="container-fluid mt-5">
         <h1 id="packetpirate" class="text-center mb-4">PacketPirate 🏴‍☠️</h1>
 
         <div class="row justify-content-center mb-3">
-            <div class="col-md-8">
+            <div class="col-md-10">
                 <div class="interface-controls">
                     <div class="interface-selector">
                         <label for="interfaceDropdown">Interface</label>
@@ -77,6 +77,11 @@
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <div id="packetList" class="packet-list bg-light p-3 rounded"></div>
+            </div>
+            <div class="col-md-2">
+                <div id="bpsDisplay" class="bg-light p-3 rounded sticky-top">
+                    Datarate: 0 KB/s
+                </div>
             </div>
         </div>
     </div>

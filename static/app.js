@@ -48,8 +48,12 @@ function connectWebSocket() {
   // if a message arrives parse the packet into json and add it to list
   socket.onmessage = function (event) {
     console.log("Received message:", event.data);
-    const packet = JSON.parse(event.data);
-    addPacketToList(packet);
+    const data = JSON.parse(event.data);
+    if (data.bps !== undefined) {
+      updateBPSDisplay(data);
+    } else {
+      addPacketToList(data);
+    }
   };
 
   // close connection if desired and reset buttons
@@ -108,6 +112,7 @@ stopButton.addEventListener("click", function () {
   this.disabled = true;
   startButton.disabled = false;
   interfaceDropdown.disabled = false;
+  bpsDisplay.innerHTML = `Datarate: 0 KB/s`;
 });
 
 // get selected interface
@@ -125,6 +130,12 @@ clearButton.addEventListener("click", function () {
 filterButton.addEventListener("click", () => {
   filterPanel.classList.add("open");
 });
+
+function updateBPSDisplay(data) {
+  bpsDisplay.innerHTML = `
+      Datarate: ${(data.bps / 1024).toFixed(2)} KB/s
+  `;
+}
 
 function isValidIP(ip) {
   // IPv4 regex
@@ -144,11 +155,11 @@ applyFilterButton.addEventListener("click", () => {
   const destIp = document.getElementById('filter-destip').value;
   const minPayloadSize = document.getElementById('filter-minpayloadsize').value;
   // check for correct inputs
-  if  (srcIp != "" && !isValidIP(srcIp)) {
+  if (srcIp != "" && !isValidIP(srcIp)) {
     alert("Please enter a valid source IP-Address.");
     return
   }
-  if  (destIp != "" && !isValidIP(destIp)) {
+  if (destIp != "" && !isValidIP(destIp)) {
     alert("Please enter a valid destination IP-Address.");
     return
   }

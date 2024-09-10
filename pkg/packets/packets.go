@@ -10,6 +10,7 @@ import (
 	"github.com/gorilla/websocket"
 	"log"
 	"sync"
+	"time"
 )
 
 // sends json with packet info to the frontend via the websocket
@@ -57,7 +58,7 @@ func CapturePackets(conn *websocket.Conn, wg *sync.WaitGroup, stopChan chan stru
 		} else {
 			bpfFilter += fmt.Sprintf("len > %v", filterOptions.MinPaylaodSize)
 		}
-		
+
 	}
 	log.Printf("Applying BPF filter: %s", bpfFilter)
 
@@ -67,6 +68,10 @@ func CapturePackets(conn *websocket.Conn, wg *sync.WaitGroup, stopChan chan stru
 		log.Println("Error setting BPF filter:", err)
 		return
 	}
+
+	var bytesInAndOut int
+	lastUpdateTime := time.Now()
+	updateInterval := time.Second
 
 	log.Println("Starting packet capture...")
 	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
@@ -78,7 +83,8 @@ func CapturePackets(conn *websocket.Conn, wg *sync.WaitGroup, stopChan chan stru
 		case packet := <-packetSource.Packets():
 			log.Println("Packet captured")
 			packetData := layers.ExtractPacketInfo(packet)
-
+			
+			// send packet to frontend
 			jsonData, err := json.Marshal(packetData)
 			if err != nil {
 				log.Println("Error marshalling packet data:", err)
@@ -89,6 +95,26 @@ func CapturePackets(conn *websocket.Conn, wg *sync.WaitGroup, stopChan chan stru
 				log.Println("Error sending packet data:", err)
 				return
 			}
+
+			// compute BPS
+			packetLength := packet.Metadata().Length
+			bytesInAndOut += packetLength
+
+			if time.Since(lastUpdateTime) >= updateInterval {
+				bpsData := types.BPSInfo{
+					Timestamp: time.Now().Unix(),
+					BPS: float64(bytesInAndOut) / updateInterval.Seconds(),
+				}
+				bpsJSON, _ := json.Marshal(bpsData)
+				if err := conn.WriteMessage(websocket.TextMessage, bpsJSON); err != nil {
+					log.Println("Error sending datarate data:", err)
+					return
+				}
+				bytesInAndOut = 0
+				lastUpdateTime = time.Now()
+			}
+			
+
 		}
 	}
 }

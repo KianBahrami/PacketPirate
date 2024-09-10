@@ -31,3 +31,8 @@ type FilterOptions struct {
 	DestIp                 string `json:"destip"`
 	MinPaylaodSize         string `json:"minpayloadsize"`
 }
+
+type BPSInfo struct {
+	Timestamp int64   `json:"timestamp"`
+	BPS       float64 `json:"bps"`
+}
