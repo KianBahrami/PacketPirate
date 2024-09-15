@@ -16,13 +16,13 @@ export function PacketToHTML(packet) {
     </div>
     <div class="packet-details" style="display: none;">
         ${createLayerDropdown(
-          "Link Layer",
-          `
+    "Link Layer",
+    `
             <p><strong>Protocol:</strong> ${packet.linklayer.protocol}</p>
             <p><strong>Source MAC:</strong> ${packet.linklayer.src}</p>
             <p><strong>Destination MAC:</strong> ${packet.linklayer.dest}</p>
           `
-        )}
+  )}
 
         ${isARP ? createARPLayerDropdown(packet.arplayer) : createNetworkLayerDropdown(packet.networklayer)}
 
@@ -31,11 +31,11 @@ export function PacketToHTML(packet) {
         ${!isARP ? createApplicationLayerDropdown(packet.applicationlayer) : ''}
 
         ${createLayerDropdown(
-          "Raw Packet",
-          `
+    "Raw Packet",
+    `
             <pre>${packet.raw}</pre>
           `
-        )}
+  )}
     </div>
   `;
 }
@@ -73,14 +73,14 @@ function createTransportLayerDropdown(transportlayer) {
       <p><strong>Source Port:</strong> ${transportlayer.src}</p>
       <p><strong>Destination Port:</strong> ${transportlayer.dest}</p>
       ${transportlayer.protocol === "TCP"
-        ? `
+      ? `
           <p><strong>Flags:</strong> ${transportlayer.tcpflags}</p>
           <p><strong>Sequence Number:</strong> ${transportlayer.tcpseq}</p>
           <p><strong>Acknowledgment Number:</strong> ${transportlayer.tcpack}</p>
           <p><strong>Window Size:</strong> ${transportlayer.tcpwindow}</p>
         `
-        : ""
-      }
+      : ""
+    }
     `
   );
 }
@@ -92,13 +92,13 @@ function createApplicationLayerDropdown(applicationlayer) {
       <p><strong>Protocol:</strong> ${applicationlayer.protocol}</p>
       <p><strong>Payload Size:</strong> ${applicationlayer.payloadsize} bytes</p>
       ${applicationlayer.protocol === "HTTP"
-        ? `
+      ? `
           <p><strong>HTTP Method:</strong> ${applicationlayer.httpmethod}</p>
           <p><strong>HTTP URL:</strong> ${applicationlayer.httpurl}</p>
           <p><strong>HTTP Version:</strong> ${applicationlayer.httpversion}</p>
         `
-        : ""
-      }
+      : ""
+    }
     `
   );
 }
@@ -114,14 +114,6 @@ function createLayerDropdown(layerName, content) {
       </div>
     </div>
   `;
-}
-
-// check wheter value to a key is just {}
-function isNotEmptyObject(obj, key) {
-  return obj.hasOwnProperty(key) && 
-         typeof obj[key] === 'object' && 
-         obj[key] !== null &&
-         Object.keys(obj[key]).length > 0;
 }
 
 // toggles a network layer's details
