@@ -25,7 +25,7 @@ func main() {
 
 		// create CORS handler
 		c := cors.New(cors.Options{
-			AllowedOrigins: []string{"http://localhost:8000"},		// "http://192.168.0.14:8000"
+			AllowedOrigins: []string{"http://localhost:8000"},
 			AllowedMethods: []string{"GET", "POST", "OPTIONS"},
 		})
 		handler := c.Handler(http.DefaultServeMux)

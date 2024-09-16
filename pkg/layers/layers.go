@@ -2,52 +2,11 @@ package layers
 
 import (
 	"fmt"
+	"github.com/KianBahrami/PacketPirate/pkg/types"
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
 	"net"
-	"time"
 )
-
-type PacketInfo struct {
-	Timestamp time.Time `json:"time"`
-	Length    int       `json:"length"`
-	LinkLayer struct {
-		Protocol string `json:"protocol"`
-		SrcMAC   string `json:"src"`
-		DstMAC   string `json:"dest"`
-	} `json:"linklayer"`
-	NetworkLayer struct {
-		Protocol     string `json:"protocol"`
-		SrcIP        string `json:"src"`
-		DstIP        string `json:"dest"`
-		TTL          uint8  `json:"ttl"`
-		ARPOperation uint16 `json:"arpoperation,omitempty"`
-	} `json:"networklayer"`
-	ARPLayer struct {
-		Operation uint16 `json:"operation,omitempty"`
-		SrcMAC    string `json:"srcmac,omitempty"`
-		DstMAC    string `json:"dstmac,omitempty"`
-		SrcIP     string `json:"srcip,omitempty"`
-		DstIP     string `json:"dstip,omitempty"`
-	} `json:"arplayer,omitempty"`
-	TransportLayer struct {
-		Protocol  string `json:"protocol"`
-		SrcPort   uint16 `json:"src"`
-		DstPort   uint16 `json:"dest"`
-		TCPFlags  string `json:"tcpflags"`
-		TCPSeq    uint32 `json:"tcpseq"`
-		TCPAck    uint32 `json:"tcpack"`
-		TCPWindow uint16 `json:"tcpwindow"`
-	} `json:"transportlayer"`
-	ApplicationLayer struct {
-		Protocol    string `json:"protocol"`
-		PayloadSize int    `json:"payloadsize"`
-		HTTPMethod  string `json:"httpmethod"`
-		HTTPURL     string `json:"httpurl"`
-		HTTPVersion string `json:"httpversion"`
-	} `json:"applicationlayer"`
-	Raw string `json:"raw"`
-}
 
 func tcpFlagsToString(tcp *layers.TCP) string {
 	var flags []string
@@ -81,8 +40,8 @@ func tcpFlagsToString(tcp *layers.TCP) string {
 	return fmt.Sprintf("%v", flags)
 }
 
-func ExtractPacketInfo(packet gopacket.Packet) PacketInfo {
-	info := PacketInfo{
+func ExtractPacketInfo(packet gopacket.Packet) types.PacketInfo {
+	info := types.PacketInfo{
 		Timestamp: packet.Metadata().Timestamp,
 		Length:    packet.Metadata().Length,
 	}
@@ -94,6 +53,13 @@ func ExtractPacketInfo(packet gopacket.Packet) PacketInfo {
 			info.LinkLayer.SrcMAC = eth.SrcMAC.String()
 			info.LinkLayer.DstMAC = eth.DstMAC.String()
 		}
+	} 
+
+	// maybe loop layer
+	if loopbackLayer := packet.Layer(layers.LayerTypeLoopback); loopbackLayer != nil {
+		info.LinkLayer.Protocol = loopbackLayer.LayerType().String()
+		info.LinkLayer.SrcMAC = "-"
+		info.LinkLayer.DstMAC = "-"
 	}
 
 	// maybe arp layer

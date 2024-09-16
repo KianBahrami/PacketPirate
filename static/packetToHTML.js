@@ -86,6 +86,9 @@ function createTransportLayerDropdown(transportlayer) {
 }
 
 function createApplicationLayerDropdown(applicationlayer) {
+  if (applicationlayer.payloadsize == '0') {
+    return "";
+  }
   return createLayerDropdown(
     "Application Layer",
     `

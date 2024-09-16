@@ -83,7 +83,7 @@ func CapturePackets(conn *websocket.Conn, wg *sync.WaitGroup, stopChan chan stru
 		case packet := <-packetSource.Packets():
 			log.Println("Packet captured")
 			packetData := layers.ExtractPacketInfo(packet)
-			
+
 			// send packet to frontend
 			jsonData, err := json.Marshal(packetData)
 			if err != nil {
@@ -103,7 +103,7 @@ func CapturePackets(conn *websocket.Conn, wg *sync.WaitGroup, stopChan chan stru
 			if time.Since(lastUpdateTime) >= updateInterval {
 				bpsData := types.BPSInfo{
 					Timestamp: time.Now().Unix(),
-					BPS: float64(bytesInAndOut) / updateInterval.Seconds(),
+					BPS:       float64(bytesInAndOut) / updateInterval.Seconds(),
 				}
 				bpsJSON, _ := json.Marshal(bpsData)
 				if err := conn.WriteMessage(websocket.TextMessage, bpsJSON); err != nil {
@@ -113,7 +113,6 @@ func CapturePackets(conn *websocket.Conn, wg *sync.WaitGroup, stopChan chan stru
 				bytesInAndOut = 0
 				lastUpdateTime = time.Now()
 			}
-			
 
 		}
 	}

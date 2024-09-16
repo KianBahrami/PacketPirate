@@ -30,7 +30,7 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 	defer conn.Close()
 
 	var wg sync.WaitGroup
-	stopChan := make(chan struct{})
+	stopChan := make(chan struct{}) // if closed all channel capture goroutines started afterwards are direvtly returning
 
 	for {
 		messageType, p, err := conn.ReadMessage()
@@ -39,7 +39,7 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 			return
 		} else if messageType == websocket.TextMessage && string(p) == "stop" {
 			log.Println("Stopping packet capture")
-			close(stopChan)
+			close(stopChan)                // next packet capture goroutine will get the stop chan signal
 			wg.Wait()                      // wait until every other capturePackets is finished
 			stopChan = make(chan struct{}) // Reset the stop channel for the next capture session
 		}
